@@ -1,0 +1,32 @@
+# SQLite version 3.x
+#   gem install sqlite3
+#
+#   Ensure the SQLite 3 gem is defined in your Gemfile
+#   gem 'sqlite3'
+# #
+
+
+default: &default
+  adapter: <%= ENV.fetch("DB_ADAPTER", "postgres") %>
+  encoding: <%= ENV.fetch("DB_ENCODING", "utf8") %>
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  username: <%= ENV.fetch("DB_USER", "postgres") %>
+  password: <%= ENV.fetch("DB_PASSWORD", "capstone") %>
+  host: <%= ENV.fetch("DB_HOST", "postgres-db") %>
+  port: <%= ENV.fetch("DB_PORT", "3306") %>
+
+
+development:
+  <<: *default
+  database: db/capstone-develop
+
+# Warning: The database defined as "test" will be erased and
+# re-generated from your development database when you run "rake".
+# Do not set this db to the same as development or production.
+# test:
+#   <<: *default
+#   database: db/capstone-test
+
+# production:
+#   <<: *default
+#   database: db/capstone-prod

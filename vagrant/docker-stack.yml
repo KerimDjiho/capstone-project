@@ -1,0 +1,59 @@
+version: '3'
+
+services:
+  postgres-db:
+    image: postgres:9.4
+    environment:
+      POSTGRES_PASSWORD: capstone
+      POSTGRES_USER: capstone
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    networks: 
+      - default
+
+  rails-app:
+    image: rimsoo/rails-app
+    command: bash -c "chmod +x wait-for-postgres.sh && ./wait-for-postgres.sh && sleep 10s && bundler exec rake db:create db:migrate db:seed --trace && bundle exec puma"
+    environment:
+      DB_ADAPTER: postgresql
+      DB_HOST: postgres-db
+      DB_PORT: 5432'
+      DB_USER: capstone
+      DB_PASSWORD: capstone
+    networks:
+      - default
+    depends_on:
+      - mysql
+    ports:
+      - 3030:3000
+
+  nginx:
+    image: nginx:1.13
+    ports:
+      - 8080:80
+    depends_on:
+      - rails-app
+    networks:
+      - default
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/nginx.conf
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 15s
+        max_attempts: 5
+
+networks:
+  default:
+    external:
+      name: capstone-net
+
+
+
+
+    
+
+
+  
